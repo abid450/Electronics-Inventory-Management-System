@@ -1,0 +1,302 @@
+<!-- templates/email/payment_confirmation.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Confirmation</title>
+    <style>
+        /* Email Styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Header */
+        .email-header {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+            padding: 30px 40px;
+            text-align: center;
+        }
+        
+        .email-header h1 {
+            font-size: 24px;
+            margin: 0;
+            font-weight: 700;
+        }
+        
+        .email-header p {
+            margin: 8px 0 0;
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        /* Body */
+        .email-body {
+            padding: 30px 40px;
+        }
+        
+        .greeting {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .greeting strong {
+            color: #1e293b;
+        }
+        
+        /* Transaction Details */
+        .details-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin: 20px 0;
+            border-left: 4px solid #22c55e;
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            color: #64748b;
+            font-size: 14px;
+        }
+        
+        .detail-value {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 14px;
+        }
+        
+        .detail-value.mono {
+            font-family: 'Courier New', monospace;
+            background: #eef2ff;
+            padding: 2px 10px;
+            border-radius: 4px;
+        }
+        
+        /* Payment Method Badge */
+        .payment-badge {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .payment-badge.bkash { background: #e63946; color: white; }
+        .payment-badge.nagad { background: #f57c00; color: white; }
+        .payment-badge.rocket { background: #2e7d32; color: white; }
+        .payment-badge.card { background: #1a237e; color: white; }
+        .payment-badge.cod { background: #4caf50; color: white; }
+
+        /* Customer Info Grid */
+        .customer-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 15px 0;
+        }
+        
+        .customer-item {
+            background: #f1f5f9;
+            padding: 12px 16px;
+            border-radius: 8px;
+        }
+        
+        .customer-item .label {
+            font-size: 11px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        
+        .customer-item .value {
+            font-size: 15px;
+            font-weight: 500;
+            color: #1e293b;
+            margin-top: 2px;
+        }
+        
+        /* Amount */
+        .amount-display {
+            text-align: center;
+            padding: 20px;
+            background: #f0fdf4;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+        
+        .amount-display .amount {
+            font-size: 32px;
+            font-weight: 700;
+            color: #16a34a;
+        }
+        
+        .amount-display .currency {
+            font-size: 18px;
+            color: #64748b;
+        }
+        
+        /* Footer */
+        .email-footer {
+            background: #f8fafc;
+            padding: 20px 40px;
+            text-align: center;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .email-footer p {
+            color: #94a3b8;
+            font-size: 12px;
+            margin: 4px 0;
+        }
+        
+        .email-footer a {
+            color: #6366f1;
+            text-decoration: none;
+        }
+        
+        .divider {
+            border: none;
+            border-top: 1px solid #e2e8f0;
+            margin: 20px 0;
+        }
+        
+        @media (max-width: 500px) {
+            .email-body {
+                padding: 20px;
+            }
+            .customer-grid {
+                grid-template-columns: 1fr;
+            }
+            .detail-row {
+                flex-direction: column;
+                gap: 2px;
+            }
+            .email-header {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="email-container">
+        <!-- Header -->
+        <div class="email-header">
+            <h1>✅ Payment Confirmed!</h1>
+            <p>Your transaction has been completed successfully</p>
+        </div>
+
+        <!-- Body -->
+        <div class="email-body">
+            <!-- Greeting -->
+            <div class="greeting">
+                <p>Dear <strong>{{ customer_name }}</strong>,</p>
+                <p style="color: #64748b; margin-top: 4px;">
+                    Thank you for your payment. Your transaction has been processed successfully.
+                </p>
+            </div>
+
+            <!-- Amount -->
+            <div class="amount-display">
+                <span class="currency">৳</span>
+                <span class="amount">{{ amount }}</span>
+            </div>
+
+            <!-- Transaction Details -->
+            <div class="details-card">
+                <div class="detail-row">
+                    <span class="detail-label">🔑 Transaction ID</span>
+                    <span class="detail-value mono">{{ tran_id }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">💳 Payment Method</span>
+                    <span class="detail-value">
+                        {% if payment_method == 'bkash' %}
+                            <span class="payment-badge bkash">📱 bKash</span>
+                        {% elif payment_method == 'nagad' %}
+                            <span class="payment-badge nagad">📱 Nagad</span>
+                        {% elif payment_method == 'rocket' %}
+                            <span class="payment-badge rocket">🚀 Rocket</span>
+                        {% elif payment_method == 'card' %}
+                            <span class="payment-badge card">💳 Card</span>
+                        {% else %}
+                            <span class="payment-badge cod">💵 Cash on Delivery</span>
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">📅 Payment Date</span>
+                    <span class="detail-value">{{ paid_at|date:"d M Y, h:i A" }}</span>
+                </div>
+            </div>
+
+            <!-- Customer Information -->
+            <h3 style="color: #1e293b; font-size: 16px; margin-bottom: 12px;">👤 Customer Information</h3>
+            
+            <div class="customer-grid">
+                <div class="customer-item">
+                    <div class="label">Full Name</div>
+                    <div class="value">{{ customer_name }}</div>
+                </div>
+                <div class="customer-item">
+                    <div class="label">Email Address</div>
+                    <div class="value">{{ customer_email }}</div>
+                </div>
+                <div class="customer-item">
+                    <div class="label">Phone Number</div>
+                    <div class="value">{{ customer_phone }}</div>
+                </div>
+                <div class="customer-item">
+                    <div class="label">City</div>
+                    <div class="value">{{ customer_city|default:"N/A" }}</div>
+                </div>
+                <div class="customer-item" style="grid-column: 1 / -1;">
+                    <div class="label">Shipping Address</div>
+                    <div class="value">{{ customer_address|default:"N/A" }}</div>
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <!-- Summary -->
+            <p style="font-size: 14px; color: #64748b; text-align: center; margin: 0;">
+                A receipt has been sent to your registered email address.
+            </p>
+        </div>
+
+        <!-- Footer -->
+        <div class="email-footer">
+            <p>This is an automated confirmation email. Please do not reply.</p>
+            <p>
+                &copy; {{ year }} Your Company. All rights reserved.
+                <br>
+                <a href="#">Privacy Policy</a> &bull; <a href="#">Terms &amp; Conditions</a>
+            </p>
+        </div>
+    </div>
+
+</body>
+</html>

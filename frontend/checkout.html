@@ -1,0 +1,948 @@
+<!-- templates/payment/checkout.html -->
+
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Checkout</title>
+    <style>
+        /* ===================== RESET ===================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .checkout-container {
+            max-width: 620px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 40px 35px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+            transition: all 0.3s ease;
+        }
+
+        .checkout-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .checkout-header .icon {
+            font-size: 48px;
+            margin-bottom: 8px;
+        }
+
+        .checkout-header h1 {
+            font-size: 26px;
+            font-weight: 700;
+            color: #1e293b;
+            letter-spacing: -0.5px;
+        }
+
+        .checkout-header p {
+            color: #64748b;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        /* ===================== CART ITEMS ===================== */
+        .cart-items-section {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .cart-items-section .section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-items-section .section-title .badge {
+            background: #6366f1;
+            color: #fff;
+            font-size: 12px;
+            padding: 2px 12px;
+            border-radius: 20px;
+        }
+
+        /* ===== Cart Item with Image ===== */
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e2e8f0;
+            gap: 12px;
+        }
+
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+
+        .cart-item .item-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .cart-item .item-image {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            flex-shrink: 0;
+            background: #f8fafc;
+            display: block;
+        }
+
+        .cart-item .item-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .cart-item .item-details .item-name {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 14px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            word-break: break-word;
+        }
+
+        .cart-item .item-details .item-qty {
+            font-size: 13px;
+            color: #94a3b8;
+        }
+
+        .cart-item .item-price {
+            font-weight: 700;
+            color: #6366f1;
+            font-size: 15px;
+            white-space: nowrap;
+        }
+
+        .cart-item .item-remove {
+            background: none;
+            border: none;
+            color: #dc2626;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: background 0.2s;
+            flex-shrink: 0;
+        }
+
+        .cart-item .item-remove:hover {
+            background: #fee2e2;
+        }
+
+        .cart-summary {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 12px;
+            border-top: 2px solid #e2e8f0;
+            margin-top: 4px;
+            font-weight: 700;
+            font-size: 16px;
+            color: #1e293b;
+        }
+
+        .cart-summary .total-amount {
+            color: #6366f1;
+            font-size: 18px;
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 20px 0;
+            color: #94a3b8;
+        }
+
+        .empty-cart .icon {
+            font-size: 40px;
+            margin-bottom: 8px;
+        }
+
+        .empty-cart a {
+            color: #6366f1;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* ===================== FORM ===================== */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+
+        .form-group label .required {
+            color: #ef4444;
+            margin-left: 2px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: inherit;
+            color: #1e293b;
+            background: #f8fafc;
+            transition: all 0.25s ease;
+            outline: none;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #6366f1;
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: #94a3b8;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        /* ===================== PAYMENT METHODS ===================== */
+        .payment-methods {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 6px 0 4px;
+        }
+
+        .payment-method {
+            padding: 12px 6px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            background: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .payment-method:hover {
+            border-color: #a5b4fc;
+            background: #f1f5f9;
+        }
+
+        .payment-method.selected {
+            border-color: #6366f1;
+            background: #eef2ff;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+
+        .payment-method img {
+            max-height: 40px;
+            object-fit: contain;
+        }
+
+        .payment-method .method-name {
+            font-size: 11px;
+            font-weight: 600;
+            color: #334155;
+            margin-top: 2px;
+        }
+
+        /* ===================== BUTTON ===================== */
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: #ffffff;
+            border: none;
+            border-radius: 14px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 8px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(99, 102, 241, 0.35);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* ===================== LOADING ===================== */
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 18px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e2e8f0;
+            border-top-color: #6366f1;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading p {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        /* ===================== MESSAGES ===================== */
+        .message {
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 18px;
+            display: none;
+        }
+
+        .message.error {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+            display: block;
+        }
+
+        .message.success {
+            background: #f0fdf4;
+            color: #16a34a;
+            border: 1px solid #bbf7d0;
+            display: block;
+        }
+
+        /* ===================== SECURITY BADGE ===================== */
+        .security-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 24px;
+            font-size: 13px;
+            color: #94a3b8;
+        }
+
+        .security-badge .lock {
+            font-size: 16px;
+        }
+
+        /* ===================== VALIDATION ===================== */
+        .form-group input.is-invalid,
+        .form-group textarea.is-invalid,
+        .form-group select.is-invalid {
+            border-color: #dc2626 !important;
+            background: #fef2f2 !important;
+            box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.1) !important;
+        }
+
+        .form-group input.is-valid,
+        .form-group textarea.is-valid,
+        .form-group select.is-valid {
+            border-color: #22c55e !important;
+            background: #f0fdf4 !important;
+            box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.1) !important;
+        }
+
+        .form-group .error-text {
+            display: none;
+            color: #dc2626 !important;
+            font-size: 13px;
+            font-weight: 500;
+            margin-top: 6px;
+            padding-left: 4px;
+        }
+
+        .form-group .error-text.show {
+            display: block !important;
+        }
+
+        #generalError {
+            display: none;
+            background: #fef2f2;
+            color: #dc2626 !important;
+            border: 1.5px solid #dc2626;
+            padding: 14px 18px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        #generalError.show {
+            display: block !important;
+        }
+
+        /* ===================== RESPONSIVE ===================== */
+        @media (max-width: 500px) {
+            .checkout-container {
+                padding: 28px 20px;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+            .payment-methods {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .checkout-header h1 {
+                font-size: 22px;
+            }
+            .btn-submit {
+                font-size: 16px;
+                padding: 14px;
+            }
+            .cart-item {
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+            .cart-item .item-image {
+                width: 40px;
+                height: 40px;
+            }
+            .cart-item .item-details .item-name {
+                font-size: 13px;
+            }
+            .cart-item .item-price {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="checkout-container">
+
+        <!-- ========================================== -->
+        <!-- HEADER -->
+        <!-- ========================================== -->
+        <div class="checkout-header">
+            <div class="icon">🛒</div>
+            <h1>Secure Checkout</h1>
+            <p>Review your order &amp; complete payment</p>
+        </div>
+
+        <!-- ===== ERROR DISPLAY ===== -->
+        <div id="generalError" class="message error"></div>
+
+        <!-- ========================================== -->
+        <!-- CART ITEMS -->
+        <!-- ========================================== -->
+        <div class="cart-items-section" id="cart-section">
+            <div class="section-title">
+                <span>🛍️ Your Order</span>
+                <span class="badge" id="item-count">0 items</span>
+            </div>
+            <div id="cart-items">
+                <div class="empty-cart">
+                    <div class="icon">⏳</div>
+                    <p>Loading your cart...</p>
+                </div>
+            </div>
+            <div id="cart-summary" style="display:none;">
+                <div class="cart-summary">
+                    <span>Total</span>
+                    <span class="total-amount" id="cart-total">৳0.00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- FORM -->
+        <!-- ========================================== -->
+        <form id="paymentForm" novalidate>
+            {% csrf_token %}
+
+            <!-- ========== PAYMENT METHOD ========== -->
+            <div class="form-group">
+                <label>Payment Method <span class="required">*</span></label>
+                <div class="payment-methods">
+                    <div class="payment-method selected" data-method="cod">
+                        <img src="/static/images/devit.webp" alt="COD" width="80">
+                        <span class="method-name">COD</span>
+                    </div>
+                    <div class="payment-method" data-method="bkash">
+                        <img src="/static/images/bkash.jpg" alt="bKash" width="65">
+                        <span class="method-name">bKash</span>
+                    </div>
+                    <div class="payment-method" data-method="nagad">
+                        <img src="/static/images/nagad.webp" alt="Nagad" width="100">
+                        <span class="method-name">Nagad</span>
+                    </div>
+                    <div class="payment-method" data-method="card">
+                        <img src="/static/images/rk.webp" alt="Card" width="66">
+                        <span class="method-name">Card</span>
+                    </div>
+                </div>
+                <div class="error-text" id="paymentFieldError"></div>
+            </div>
+
+            <!-- ========== FULL NAME ========== -->
+            <div class="form-group">
+                <label>Full Name <span class="required">*</span></label>
+                <input type="text" id="customer_name" placeholder="Enter your full name">
+                <div class="error-text" id="nameFieldError"></div>
+            </div>
+
+            <!-- ========== EMAIL + PHONE ========== -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Email Address <span class="required">*</span></label>
+                    <input type="email" id="customer_email" placeholder="you@example.com">
+                    <div class="error-text" id="emailFieldError"></div>
+                </div>
+                <div class="form-group">
+                    <label>Phone Number <span class="required">*</span></label>
+                    <input type="tel" id="customer_phone" placeholder="017XXXXXXXX">
+                    <div class="error-text" id="phoneFieldError"></div>
+                </div>
+            </div>
+
+            <!-- ========== ADDRESS ========== -->
+            <div class="form-group">
+                <label>Shipping Address</label>
+                <textarea id="customer_address" rows="2" placeholder="House, Road, Area, City"></textarea>
+                <div class="error-text" id="addressFieldError"></div>
+            </div>
+
+            <!-- ========== CITY ========== -->
+            <div class="form-group">
+                <label>City</label>
+                <input type="text" id="customer_city" placeholder="Dhaka">
+                <div class="error-text" id="cityFieldError"></div>
+            </div>
+
+            <!-- ========== ORDER NOTES ========== -->
+            <div class="form-group">
+                <label>Order Notes <span style="font-weight:400;color:#94a3b8;">(optional)</span></label>
+                <textarea id="order_notes" rows="2" placeholder="Special delivery instructions..."></textarea>
+            </div>
+
+            <!-- ========== SUBMIT ========== -->
+            <button type="submit" class="btn-submit" id="submitBtn">
+                <i class="fas fa-lock"></i> Place Order
+            </button>
+
+        </form>
+
+        <!-- ========================================== -->
+        <!-- LOADING -->
+        <!-- ========================================== -->
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Processing your order...</p>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- SECURITY BADGE -->
+        <!-- ========================================== -->
+        <div class="security-badge">
+            <span class="lock">🔒</span>
+            <span>Your information is secure &amp; encrypted</span>
+        </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- JAVASCRIPT (Complete Fixed with Product Images) -->
+    <!-- ========================================== -->
+    <script>
+        // ============================================
+        // CSRF TOKEN
+        // ============================================
+        function getCookie(name) {
+            let value = null;
+            if (document.cookie && document.cookie !== '') {
+                document.cookie.split(';').forEach(c => {
+                    const trimmed = c.trim();
+                    if (trimmed.startsWith(name + '=')) {
+                        value = decodeURIComponent(trimmed.substring(name.length + 1));
+                    }
+                });
+            }
+            return value;
+        }
+
+        // ============================================
+        // PAYMENT METHOD SELECTION
+        // ============================================
+        document.querySelectorAll('.payment-method').forEach(el => {
+            el.addEventListener('click', function() {
+                document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
+                this.classList.add('selected');
+            });
+        });
+
+        // ============================================
+        // ✅ LOAD CART FROM API (with Product Images)
+        // ============================================
+        async function loadCart() {
+            const container = document.getElementById('cart-items');
+            const summary = document.getElementById('cart-summary');
+            const countBadge = document.getElementById('item-count');
+            const totalEl = document.getElementById('cart-total');
+
+            try {
+                const response = await fetch('/api/cart/');
+                const data = await response.json();
+
+                console.log('📦 Cart Data:', data);
+
+                if (!data.success || !data.data || !data.data.items || data.data.items.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-cart">
+                            <div class="icon">🛒</div>
+                            <p>Your cart is empty</p>
+                            <a href="/products/">Browse Products</a>
+                        </div>
+                    `;
+                    summary.style.display = 'none';
+                    countBadge.textContent = '0 items';
+                    return;
+                }
+
+                const cart = data.data;
+                let subtotal = 0;
+
+                // ✅ Store cart items with images
+                window.cartItems = cart.items.map(item => {
+                    const total = item.product_price * item.quantity;
+                    subtotal += total;
+                    
+                    // ✅ Get product image - 'image' field from serializer
+                    let imageUrl = item.image || '/static/images/no-image.png';
+                    
+                    // ✅ যদি আপেক্ষিক URL হয়, তাহলে সম্পূর্ণ URL তৈরি করুন
+                    if (imageUrl && imageUrl.startsWith('/')) {
+                        imageUrl = window.location.origin + imageUrl;
+                    }
+                    
+                    return {
+                        ...item,
+                        total: total,
+                        image: imageUrl
+                    };
+                });
+
+                // ✅ Render cart items with images
+                container.innerHTML = window.cartItems.map(item => {
+                    const total = item.total;
+                    const imageUrl = item.image || 'https://via.placeholder.com/50x50?text=No+Image';
+
+                    return `
+                        <div class="cart-item">
+                            <div class="item-info">
+                                <img src="${imageUrl}" 
+                                     alt="${item.product_name}" 
+                                     class="item-image"
+                                     onerror="this.src='https://via.placeholder.com/50x50?text=No+Image'">
+                                <div class="item-details">
+                                    <div class="item-name">${item.product_name}</div>
+                                    <div class="item-qty">Quantity: ${item.quantity}</div>
+                                </div>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <span class="item-price">৳${parseFloat(total).toFixed(2)}</span>
+                                <button class="item-remove" onclick="removeFromCart('${item.product}')">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                // Update summary
+                const shipping = subtotal > 0 ? 100 : 0;
+                const total = subtotal + shipping;
+
+                summary.style.display = 'block';
+                countBadge.textContent = `${cart.total_items || 0} items`;
+                totalEl.textContent = `৳${parseFloat(total).toFixed(2)}`;
+
+            } catch (error) {
+                console.error('❌ Error loading cart:', error);
+                container.innerHTML = `
+                    <div class="empty-cart">
+                        <div class="icon">⚠️</div>
+                        <p>Failed to load cart</p>
+                        <button onclick="loadCart()" style="margin-top:8px; padding:8px 16px; background:#6366f1; color:#fff; border:none; border-radius:6px; cursor:pointer;">Retry</button>
+                    </div>
+                `;
+            }
+        }
+
+        // ============================================
+        // ✅ REMOVE FROM CART
+        // ============================================
+        async function removeFromCart(productId) {
+            try {
+                const response = await fetch('/api/cart/', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken'),
+                    },
+                    body: JSON.stringify({ product_id: productId })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    loadCart(); // Reload cart
+                    updateCartCount();
+                }
+            } catch (error) {
+                console.error('Error removing item:', error);
+            }
+        }
+
+        // ============================================
+        // ✅ UPDATE CART COUNT (Header)
+        // ============================================
+        async function updateCartCount() {
+            try {
+                const response = await fetch('/api/cart/count/');
+                const data = await response.json();
+                if (data.success) {
+                    const count = data.data.count || 0;
+                    // Update all cart badges
+                    document.querySelectorAll('.cart-badge').forEach(el => {
+                        el.textContent = count;
+                    });
+                }
+            } catch (error) {
+                console.error('Error updating cart count:', error);
+            }
+        }
+
+        // ============================================
+        // ✅ CLEAR ERRORS
+        // ============================================
+        function clearFieldErrors() {
+            document.querySelectorAll('.form-group input, .form-group textarea').forEach(input => {
+                input.classList.remove('is-invalid', 'is-valid');
+            });
+            document.querySelectorAll('.error-text').forEach(el => {
+                el.textContent = '';
+                el.classList.remove('show');
+            });
+            const generalError = document.getElementById('generalError');
+            generalError.textContent = '';
+            generalError.style.display = 'none';
+        }
+
+        // ============================================
+        // ✅ SHOW ERROR
+        // ============================================
+        function showError(message, type = 'error') {
+            const generalError = document.getElementById('generalError');
+            generalError.textContent = message;
+            generalError.className = `message ${type}`;
+            generalError.style.display = 'block';
+        }
+
+        // ============================================
+        // ✅ FORM SUBMIT (Complete Fixed)
+        // ============================================
+        document.getElementById('paymentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            clearFieldErrors();
+
+            const selected = document.querySelector('.payment-method.selected');
+            const paymentMethod = selected ? selected.dataset.method : 'card';
+
+            // Get cart items
+            const cartItems = window.cartItems || [];
+
+            if (cartItems.length === 0) {
+                showError('Your cart is empty! Please add items before checkout.', 'error');
+                return;
+            }
+
+            // Validate form
+            const name = document.getElementById('customer_name').value.trim();
+            const email = document.getElementById('customer_email').value.trim();
+            const phone = document.getElementById('customer_phone').value.trim();
+
+            if (!name || !email || !phone) {
+                showError('Please fill in all required fields.', 'error');
+                return;
+            }
+
+            const payload = {
+                customer_name: name,
+                customer_email: email,
+                customer_phone: phone,
+                customer_address: document.getElementById('customer_address').value.trim(),
+                customer_city: document.getElementById('customer_city').value.trim(),
+                payment_method: paymentMethod,
+                items: cartItems.map(item => ({
+                    product_id: item.product,
+                    quantity: item.quantity,
+                    unit_price: item.product_price
+                })),
+                notes: document.getElementById('order_notes').value.trim()
+            };
+
+            console.log('📦 Sending:', payload);
+
+            const btn = document.getElementById('submitBtn');
+            const loading = document.getElementById('loading');
+            btn.disabled = true;
+            btn.textContent = 'Processing...';
+            loading.style.display = 'block';
+
+            try {
+                const response = await fetch('/checkout/api/initiate/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken'),
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+                console.log('📦 Response:', data);
+
+                if (data.status === 'success' && data.data && data.data.payment_url) {
+                    // ✅ Cart will be cleared by backend
+                    // ✅ Clear local cart data
+                    window.cartItems = [];
+                    
+                    // ✅ Redirect to SSLCommerz
+                    window.location.href = data.data.payment_url;
+                } else {
+                    btn.disabled = false;
+                    btn.textContent = 'Place Order';
+                    loading.style.display = 'none';
+
+                    if (data.errors) {
+                        const fieldMapping = {
+                            'customer_name': 'nameFieldError',
+                            'customer_email': 'emailFieldError',
+                            'customer_phone': 'phoneFieldError',
+                            'payment_method': 'paymentFieldError',
+                            'customer_address': 'addressFieldError',
+                            'customer_city': 'cityFieldError',
+                        };
+
+                        let hasError = false;
+
+                        for (const [backendField, frontendId] of Object.entries(fieldMapping)) {
+                            if (data.errors[backendField]) {
+                                const messages = Array.isArray(data.errors[backendField]) 
+                                    ? data.errors[backendField].join(', ') 
+                                    : data.errors[backendField];
+
+                                const field = document.getElementById(backendField);
+                                const errorEl = document.getElementById(frontendId);
+
+                                if (field) {
+                                    field.classList.add('is-invalid');
+                                }
+                                if (errorEl) {
+                                    errorEl.textContent = messages;
+                                    errorEl.classList.add('show');
+                                }
+                                hasError = true;
+                            }
+                        }
+
+                        if (data.errors.non_field_errors) {
+                            const generalMsg = Array.isArray(data.errors.non_field_errors) 
+                                ? data.errors.non_field_errors.join(', ') 
+                                : data.errors.non_field_errors;
+                            showError(generalMsg, 'error');
+                            hasError = true;
+                        }
+
+                        if (!hasError && data.message) {
+                            showError(data.message, 'error');
+                        }
+                    } else {
+                        showError(data.message || 'Checkout failed. Please try again.', 'error');
+                    }
+                }
+            } catch (error) {
+                console.error('❌ Error:', error);
+                btn.disabled = false;
+                btn.textContent = 'Place Order';
+                loading.style.display = 'none';
+                showError('Network error. Please check your connection and try again.', 'error');
+            }
+        });
+
+        // ============================================
+        // ✅ INIT
+        // ============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCart();
+            updateCartCount();
+        });
+    </script>
+
+</body>
+</html>

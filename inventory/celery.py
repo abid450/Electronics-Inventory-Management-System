@@ -18,36 +18,45 @@ def debug_task(self):
     return f'Task executed successfully with id: {self.request.id}'
 
 
-"""
+
 # Periodic tasks (Celery Beat)
 app.conf.beat_schedule = {
-    'cleanup-old-tasks': {
-        'task': 'Payment.tasks.cleanup_old_tasks',
-        'schedule': crontab(hour=2, minute=0),  # Daily at 2 AM
-        'options': {
-            'expires': 3600,
-        },
-    },
+    # ... existing schedules ...
     
-    # Send pending payment reminders (optional)
+    'check_and_notify_low_stock': {
+        'task': 'stock_alert.tasks.check_and_notify_low_stock',
+        'schedule': crontab(minute='*/15'),  # Every 15 minutes
+        'options': {
+            'expires': 600,  # 10 minutes
+            'queue': 'default',
+        },
+
+        # Send pending payment reminders (optional)
     'send-pending-reminders': {
-        'task': 'Payment.tasks.send_pending_reminder',
+        'task': 'stock_alert.tasks.send_pending_reminder',
         'schedule': crontab(hour=10, minute=0),  # সকাল ১০টা
         'options': {
             'expires': 1800,
         },
     },
-}
+    },
 
+
+   
+    
+}
 
 # Task routes (বিভিন্ন queue তে পাঠানোর জন্য)
 app.conf.task_routes = {
-    'Payment.tasks.send_payment_confirmation_email': {'queue': 'email'},
-    'Payment.tasks.send_pending_reminder': {'queue': 'email'},
-    'Payment.tasks.cleanup_expired_transactions': {'queue': 'default'},
-    'Payment.tasks.*': {'queue': 'default'},
+    
+    'stock_alert.tasks.check_low_stock': {'queue': 'default'},
+    'stock_alert.tasks.check_and_notify_low_stock': {'queue': 'default'},
+    'stock_alert.tasks.send_low_stock_email': {'queue': 'email'},
+    'stock_alert.tasks.send_payment_confirmation_email': {'queue': 'email'},
+    'stock_alert.tasks.send_pending_reminder': {'queue': 'email'},
+
+
 }
-"""
 
 # ============================================================
 # TASK QUEUES
@@ -61,6 +70,12 @@ app.conf.task_queues = {
     'email': {
         'exchange': 'email',
         'routing_key': 'email',
+    },
+
+    'low_priority': {
+        'exchange': 'low_priority',
+        'routing_key': 'low_priority',
+        'exchange_type': 'direct',
     },
 }
 

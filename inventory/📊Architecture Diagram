@@ -49,3 +49,20 @@
 │  • Transactions   │  │  • Cache         │  │  │   (Async)   │  │
 │  • Relationships  │  │  • Celery Broker │  │  └─────────────┘  │
 └───────────────────┘  └───────────────────┘  └───────────────────┘
+
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                          Technology Stack                             │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                       │
+│  🐍 Backend        │  Python 3.13 + Django 4.2 + DRF                │
+│  🗄️ Database       │  PostgreSQL 15                                  │
+│  ⚡ Cache          │  Redis 7                                        │
+│  🔄 Task Queue     │  Celery 5.3 + Celery Beat                     │
+│  🌐 Web Server     │  Nginx Alpine                                  │
+│  🚀 WSGI Server    │  Gunicorn 21.2                                │
+│  🐳 Container      │  Docker + Docker Compose                      │
+│  📦 Monitoring     │  Flower (Celery Monitoring)                   │
+│  🔐 Security       │  JWT + Environment Variables                  │
+│                                                                       │
+└─────────────────────────────────────────────────────────────────────────┘

@@ -1,0 +1,111 @@
+<!-- templates/emails/daily_stock_report.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Stock Report</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f4f7fc;
+            padding: 20px;
+        }
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+        }
+        .header h1 { font-size: 24px; margin: 0; }
+        .header p { opacity: 0.8; margin: 5px 0 0; }
+        .content { padding: 30px; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .card {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .card .number {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        .card .label {
+            font-size: 13px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+        .card.danger .number { color: #dc2626; }
+        .card.success .number { color: #22c55e; }
+        .card.primary .number { color: #2563eb; }
+        .footer {
+            background: #f8fafc;
+            padding: 15px 30px;
+            text-align: center;
+            font-size: 13px;
+            color: #94a3b8;
+        }
+        .footer a { color: #2563eb; text-decoration: none; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>📊 Daily Stock Report</h1>
+        <p>{{ today|date:"d M Y" }}</p>
+    </div>
+    <div class="content">
+        <div class="grid">
+            <div class="card primary">
+                <div class="number">{{ total_products }}</div>
+                <div class="label">Total Products</div>
+            </div>
+            <div class="card danger">
+                <div class="number">{{ low_stock_count }}</div>
+                <div class="label">⚠️ Low Stock</div>
+            </div>
+            <div class="card danger">
+                <div class="number">{{ out_of_stock_count }}</div>
+                <div class="label">❌ Out of Stock</div>
+            </div>
+            <div class="card success">
+                <div class="number">${{ total_stock_value|floatformat:0 }}</div>
+                <div class="label">Total Stock Value</div>
+            </div>
+            <div class="card primary">
+                <div class="number">{{ today_orders }}</div>
+                <div class="label">📦 Today's Orders</div>
+            </div>
+            <div class="card success">
+                <div class="number">${{ today_revenue|floatformat:0 }}</div>
+                <div class="label">💰 Today's Revenue</div>
+            </div>
+        </div>
+        <div style="text-align:center; margin-top:20px;">
+            <a href="{{ site_url }}/admin/" style="background:#2563eb;color:white;padding:10px 24px;border-radius:6px;text-decoration:none;">
+                🔗 View Dashboard
+            </a>
+        </div>
+    </div>
+    <div class="footer">
+        &copy; {{ year }} {{ site_name }}. All rights reserved.
+    </div>
+</div>
+</body>
+</html>

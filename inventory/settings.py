@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 from decouple import config
+import sys
+from pathlib import Path
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -23,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-a-1rxhhr(l9vcili@e$^z(go_bl1(=(b2)3$kt$e#%09hfqm17'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DJANGO_DEBUG', default=False, cast=bool)
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -31,6 +34,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,12 +47,29 @@ INSTALLED_APPS = [
     'django_celery_results',
     'rest_framework',
     'corsheaders',
-    'django_extensions',
+    'silk',
+    'stock',
+    'products',
+    'customers',
+    'suppliers',
+    'stock_alert',
+    "django_celeryx.admin",
+    'checkout',
+    'order',
+    'cart',
+    'django_filters',  
+
+    
+
+
+
 
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',  
+    'corsheaders.middleware.CorsMiddleware',  # ✅ উপরে রাখুন
+    'silk.middleware.SilkyMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -63,7 +84,7 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8000",
     "http://127.0.0.1:8000",
-    "http://localhost:3000",  # React frontend
+    "http://localhost:3000",  
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -72,6 +93,7 @@ CORS_ALLOW_CREDENTIALS = True
 ROOT_URLCONF = 'inventory.urls'
 
 import os
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -87,6 +109,7 @@ TEMPLATES = [
         },
     },
 ]
+
 
 WSGI_APPLICATION = 'inventory.wsgi.application'
 
@@ -137,6 +160,67 @@ CACHES = {
         'TIMEOUT': 300,
     }
 }
+
+
+
+
+REST_FRAMEWORK = {
+    
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+
+
+    """'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+    ],"""
+   """
+
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+    ],
+
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '100/day',
+        'user': '1000/day',
+        'burst': '20/min',
+        'sustained': '200/day',
+        'content_generation': '10/min',
+        'bulk_generation': '5/hour',
+    },"""
+
+
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20,
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
+        'rest_framework.filters.OrderingFilter',
+    ],
+
+     'DEFAULT_RENDERER_CLASSES': [
+            'rest_framework.renderers.JSONRenderer',
+            'rest_framework.renderers.BrowsableAPIRenderer',  
+        ],
+
+    
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.MultiPartParser',
+        'rest_framework.parsers.FormParser',
+    ],
+    #'EXCEPTION_HANDLER': 'apps.accounts.utils.custom_exception_handler',
+    'NON_FIELD_ERRORS_KEY': 'error',
+    'TEST_REQUEST_DEFAULT_FORMAT': 'json',
+    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.URLPathVersioning',
+    'DEFAULT_VERSION': 'v1',
+    'ALLOWED_VERSIONS': ['v1'],
+    'VERSION_PARAM': 'version',
+}
+
+
+
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
@@ -168,14 +252,61 @@ USE_I18N = True
 USE_TZ = True
 
 
- #========== STATIC & MEDIA ==========
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/5.2/howto/static-files/
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'frontend'),
 ]
 
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+
+# ✅ WhiteNoise Storage (Production)
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+
+
+
+
+ #Media files
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+
+JAZZMIN_UI_TWEAKS = {
+    "navbar_small_text": False,
+    "footer_small_text": False,
+    "body_small_text": True,
+    "brand_small_text": False,
+    "brand_colour": False,
+    "accent": "accent-olive",
+    "navbar": "navbar-cyan navbar-dark",
+    "no_navbar_border": False,
+    "navbar_fixed": False,
+    "layout_boxed": False,
+    "footer_fixed": False,
+    "sidebar_fixed": False,
+    "sidebar": "sidebar-dark-lightblue",
+    "sidebar_nav_small_text": False,
+    "sidebar_disable_expand": False,
+    "sidebar_nav_child_indent": False,
+    "sidebar_nav_compact_style": False,
+    "sidebar_nav_legacy_style": False,
+    "sidebar_nav_flat_style": True,
+    "theme": "cosmo",
+    "dark_mode_theme": None,
+    "button_classes": {
+        "primary": "btn-outline-primary",
+        "secondary": "btn-outline-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success"
+    }
+}
 
 
 
@@ -222,3 +353,34 @@ EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='')
 SUPPORT_EMAIL = 'support@yourapp.com'
+
+# ✅ Admin emails for alerts
+ADMIN_EMAILS = config('ADMIN_EMAILS', default='').split(',')
+
+# ✅ Site Settings
+SITE_NAME = config('SITE_NAME', default='Inventory System')
+SITE_URL = config('SITE_URL', default='http://localhost:8000')
+
+
+# ============================================
+# SSLCOMMERZ ✅ (পেমেন্ট গেটওয়ে)
+# ============================================
+SSLCOMMERZ_STORE_ID = config('SSLCOMMERZ_STORE_ID', default='testbox')
+SSLCOMMERZ_STORE_PASSWORD = config('SSLCOMMERZ_STORE_PASSWORD', default='testbox123')
+SSLCOMMERZ_SANDBOX = config('SSLCOMMERZ_SANDBOX', default=True, cast=bool)
+SSLCOMMERZ_CURRENCY = config('SSLCOMMERZ_CURRENCY', default='BDT')
+
+
+# ============= Payment URLs (from .env) =============
+PAYMENT_SUCCESS_URL = config('PAYMENT_SUCCESS_URL')
+PAYMENT_FAIL_URL = config('PAYMENT_FAIL_URL')
+PAYMENT_CANCEL_URL = config('PAYMENT_CANCEL_URL')
+PAYMENT_IPN_URL = config('PAYMENT_IPN_URL')
+
+# SSLCommerz Dictionary (for services.py)
+SSLCOMMERZ = {
+    'store_id': SSLCOMMERZ_STORE_ID,
+    'store_pass': SSLCOMMERZ_STORE_PASSWORD,
+    'issandbox': SSLCOMMERZ_SANDBOX,
+}
+

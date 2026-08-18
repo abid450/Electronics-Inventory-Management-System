@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .success-container {
+            max-width: 600px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 45px 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+            animation: slideUp 0.6s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .success-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            animation: pop 0.5s ease;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(0); }
+            70% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .success-icon svg {
+            width: 45px;
+            height: 45px;
+            fill: none;
+            stroke: #ffffff;
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .success-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #166534;
+            margin-bottom: 6px;
+        }
+
+        .success-header p {
+            color: #64748b;
+            font-size: 15px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 18px;
+            background: #dcfce7;
+            color: #166534;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 25px;
+        }
+
+        .transaction-card {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 24px 28px;
+            margin-bottom: 25px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .transaction-card .label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .transaction-card .value {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+            word-break: break-all;
+        }
+
+        .transaction-card .value.mono {
+            font-family: 'Courier New', monospace;
+            background: #eef2ff;
+            padding: 4px 12px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        .transaction-card .copy-btn {
+            background: none;
+            border: none;
+            color: #6366f1;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 10px;
+            transition: color 0.2s;
+        }
+
+        .transaction-card .copy-btn:hover {
+            color: #4f46e5;
+        }
+
+        .customer-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .info-item {
+            background: #f1f5f9;
+            padding: 14px 18px;
+            border-radius: 12px;
+        }
+
+        .info-item .label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .info-item .value {
+            font-size: 16px;
+            font-weight: 500;
+            color: #1e293b;
+            margin-top: 2px;
+        }
+
+        .payment-details {
+            background: #f1f5f9;
+            border-radius: 16px;
+            padding: 20px 24px;
+            margin-bottom: 25px;
+        }
+
+        .payment-details .row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .payment-details .row:last-child {
+            border-bottom: none;
+        }
+
+        .payment-details .row .label {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .payment-details .row .value {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 14px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge.bkash { background: #e63946; color: white; }
+        .badge.nagad { background: #f57c00; color: white; }
+        .badge.rocket { background: #2e7d32; color: white; }
+        .badge.card { background: #1a237e; color: white; }
+        .badge.cod { background: #4caf50; color: white; }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 28px rgba(99, 102, 241, 0.35);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #6366f1;
+            border: 2px solid #6366f1;
+        }
+
+        .btn-outline:hover {
+            background: #6366f1;
+            color: #ffffff;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: #ffffff;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 28px rgba(34, 197, 94, 0.35);
+        }
+
+        .footer {
+            margin-top: 25px;
+            text-align: center;
+            font-size: 13px;
+            color: #94a3b8;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 20px;
+        }
+
+        .footer a {
+            color: #6366f1;
+            text-decoration: none;
+        }
+
+        @media (max-width: 500px) {
+            .success-container {
+                padding: 28px 20px;
+            }
+            .customer-info {
+                grid-template-columns: 1fr;
+            }
+            .action-buttons {
+                flex-direction: column;
+            }
+            .btn {
+                justify-content: center;
+            }
+            .success-header h1 {
+                font-size: 22px;
+            }
+            .transaction-card .value {
+                font-size: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="success-container">
+
+        <div class="success-header">
+            <div class="success-icon">
+                <svg viewBox="0 0 24 24">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+            </div>
+            <h1>Payment Successful! 🎉</h1>
+            <p>Your transaction has been completed successfully.</p>
+            <div class="status-badge">✅ Completed</div>
+        </div>
+
+        <div class="transaction-card">
+            <div class="label">🔑 Transaction ID</div>
+            <div class="value mono" id="tranIdDisplay">
+                {{ transaction.tran_id }}
+                <button class="copy-btn" onclick="copyTranId()" title="Copy Transaction ID">
+                    📋 Copy
+                </button>
+            </div>
+        </div>
+
+        <div class="customer-info">
+            <div class="info-item">
+                <div class="label">👤 Customer Name</div>
+                <div class="value">{{ transaction.customer_name|default:"N/A" }}</div>
+            </div>
+            <div class="info-item">
+                <div class="label">📧 Email Address</div>
+                <div class="value">{{ transaction.customer_email|default:"N/A" }}</div>
+            </div>
+            <div class="info-item">
+                <div class="label">📱 Phone Number</div>
+                <div class="value">{{ transaction.customer_phone|default:"N/A" }}</div>
+            </div>
+            <div class="info-item">
+                <div class="label">📍 City</div>
+                <div class="value">{{ transaction.customer_city|default:"N/A" }}</div>
+            </div>
+        </div>
+
+        <div class="payment-details">
+            <div class="row">
+                <span class="label">💰 Amount</span>
+                <span class="value">৳ {{ transaction.amount }}</span>
+            </div>
+            <div class="row">
+                <span class="label">💳 Payment Method</span>
+                <span class="value">
+                    {% if transaction.payment_method == 'bkash' %}
+                        <span class="badge bkash">📱 bKash</span>
+                    {% elif transaction.payment_method == 'nagad' %}
+                        <span class="badge nagad">📱 Nagad</span>
+                    {% elif transaction.payment_method == 'rocket' %}
+                        <span class="badge rocket">🚀 Rocket</span>
+                    {% elif transaction.payment_method == 'card' %}
+                        <span class="badge card">💳 Card</span>
+                    {% else %}
+                        <span class="badge cod">💵 Cash on Delivery</span>
+                    {% endif %}
+                </span>
+            </div>
+            <div class="row">
+                <span class="label">📅 Payment Date</span>
+                <span class="value">{{ transaction.paid_at|date:"d M Y, h:i A" }}</span>
+            </div>
+            <div class="row">
+                <span class="label">📊 Status</span>
+                <span class="value" style="color: #16a34a;">✅ Successful</span>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <a href="/" class="btn btn-primary">🏠 Go to Home</a>
+            <a href="#" class="btn btn-success" onclick="window.print()">🖨️ Print Receipt</a>
+            <a href="/payment/history/" class="btn btn-outline">📋 View History</a>
+        </div>
+
+        <div class="footer">
+            <p>
+                A confirmation email has been sent to <strong>{{ transaction.customer_email }}</strong>.
+                If you have any questions, please contact <a href="mailto:support@example.com">support</a>.
+            </p>
+            <p style="margin-top: 6px; font-size: 12px;">
+                Transaction ID: <span style="font-family: monospace; color: #475569;">{{ transaction.tran_id }}</span>
+            </p>
+        </div>
+
+    </div>
+
+    <script>
+        function copyTranId() {
+            const tranId = document.getElementById('tranIdDisplay').textContent.trim().replace('Copy', '').trim();
+            navigator.clipboard.writeText(tranId)
+                .then(() => {
+                    const btn = document.querySelector('.copy-btn');
+                    const originalText = btn.textContent;
+                    btn.textContent = '✅ Copied!';
+                    setTimeout(() => {
+                        btn.textContent = originalText;
+                    }, 2000);
+                })
+                .catch(() => {
+                    alert('Failed to copy. Please copy manually.');
+                });
+        }
+    </script>
+
+</body>
+</html>

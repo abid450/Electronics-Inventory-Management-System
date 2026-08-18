@@ -1,0 +1,688 @@
+<!-- templates/frontend/low_stock_alert.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Low Stock Alert</title>
+    <style>
+        /* ============================================
+           RESET & BASE
+           ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f0f4ff 0%, #e8edf5 100%);
+            padding: 30px 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ============================================
+           CONTAINER
+           ============================================ */
+        .container {
+            max-width: 700px;
+            width: 100%;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.10), 0 8px 24px rgba(0, 0, 0, 0.04);
+            overflow: hidden;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ============================================
+           HEADER
+           ============================================ */
+        .header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            color: #ffffff;
+            padding: 35px 40px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -30%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -40%;
+            left: -20%;
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.10) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .header-icon {
+            font-size: 48px;
+            margin-bottom: 8px;
+            display: block;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header h1 {
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header h1 span {
+            color: #fbbf24;
+        }
+
+        .header .subtitle {
+            font-size: 15px;
+            opacity: 0.75;
+            margin-top: 6px;
+            position: relative;
+            z-index: 1;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+        }
+
+        .badge-container {
+            display: inline-block;
+            margin-top: 14px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #ef4444;
+            color: #ffffff;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
+        }
+
+        .badge .pulse {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #ffffff;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.6);
+                opacity: 0.4;
+            }
+        }
+
+        /* ============================================
+           CONTENT
+           ============================================ */
+        .content {
+            padding: 35px 40px 40px;
+        }
+
+        /* --- Alert Summary Box --- */
+        .alert-summary {
+            background: #fef2f2;
+            border-left: 5px solid #dc2626;
+            padding: 18px 24px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+        }
+
+        .alert-summary .icon {
+            font-size: 22px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .alert-summary .text h3 {
+            color: #991b1b;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .alert-summary .text p {
+            color: #7f1d1d;
+            font-size: 14px;
+            margin-top: 2px;
+            opacity: 0.9;
+        }
+
+        .alert-summary .text strong {
+            color: #dc2626;
+        }
+
+        /* --- Section Title --- */
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 12px;
+            margin: 30px 0 18px 0;
+        }
+
+        .section-title .count-badge {
+            background: #2563eb;
+            color: #ffffff;
+            padding: 2px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .section-title .count-badge.danger {
+            background: #dc2626;
+        }
+
+        .section-title .count-badge.warning {
+            background: #f59e0b;
+        }
+
+        /* --- Table --- */
+        .table-wrapper {
+            background: #f8fafc;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        thead {
+            background: #f1f5f9;
+        }
+
+        th {
+            text-align: left;
+            padding: 14px 16px;
+            font-weight: 700;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #475569;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #1e293b;
+            font-weight: 500;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: #f8fafc;
+        }
+
+        .product-name {
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .product-sku {
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 400;
+        }
+
+        .status-tag {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        .status-tag.low {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .status-tag.out {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .status-tag.critical {
+            background: #fecaca;
+            color: #991b1b;
+        }
+
+        .stock-cell {
+            font-weight: 700;
+        }
+
+        .stock-cell.low-stock {
+            color: #dc2626;
+        }
+
+        .stock-cell.out-stock {
+            color: #991b1b;
+        }
+
+        /* --- Buttons --- */
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 35px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 28px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 15px;
+            text-decoration: none;
+            transition: all 0.25s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.30);
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.30);
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(220, 38, 38, 0.35);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #475569;
+            border: 2px solid #e2e8f0;
+        }
+
+        .btn-outline:hover {
+            background: #f1f5f9;
+            border-color: #94a3b8;
+        }
+
+        /* --- Empty State --- */
+        .empty-state {
+            text-align: center;
+            padding: 25px 20px;
+            color: #94a3b8;
+        }
+
+        .empty-state .icon {
+            font-size: 40px;
+            margin-bottom: 6px;
+        }
+
+        /* ============================================
+           FOOTER
+           ============================================ */
+        .footer {
+            background: #f8fafc;
+            padding: 22px 40px;
+            text-align: center;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .footer p {
+            font-size: 13px;
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+
+        .footer .brand {
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .footer .links {
+            display: flex;
+            justify-content: center;
+            gap: 18px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .footer .links a {
+            color: #2563eb;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .footer .links a:hover {
+            color: #1d4ed8;
+            text-decoration: underline;
+        }
+
+        .footer .divider {
+            color: #cbd5e1;
+        }
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 600px) {
+            body {
+                padding: 15px 10px;
+            }
+
+            .header {
+                padding: 25px 20px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .content {
+                padding: 24px 18px 30px;
+            }
+
+            .alert-summary {
+                padding: 14px 16px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .table-wrapper {
+                overflow-x: auto;
+            }
+
+            table {
+                font-size: 13px;
+                min-width: 500px;
+            }
+
+            th,
+            td {
+                padding: 10px 12px;
+            }
+
+            .badge {
+                font-size: 12px;
+                padding: 6px 16px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .btn {
+                justify-content: center;
+                padding: 14px 20px;
+            }
+
+            .footer {
+                padding: 18px 20px;
+            }
+
+            .footer .links {
+                flex-direction: column;
+                gap: 6px;
+            }
+
+            .footer .divider {
+                display: none;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .header-icon {
+                font-size: 36px;
+            }
+            .header h1 {
+                font-size: 18px;
+            }
+            .badge-container .badge {
+                font-size: 11px;
+                padding: 5px 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- ============================================
+    HEADER
+    ============================================ -->
+    <div class="header">
+        <span class="header-icon">📦</span>
+        <h1>Inventory <span>Alert</span></h1>
+        <p class="subtitle">{{ site_name }} – Real‑time Stock Monitoring</p>
+        <div class="badge-container">
+            <span class="badge">
+                <span class="pulse"></span>
+                ⚠️ {{ total_alerts }} items need attention
+            </span>
+        </div>
+    </div>
+
+    <!-- ============================================
+    CONTENT
+    ============================================ -->
+    <div class="content">
+
+        <!-- Alert Summary -->
+        <div class="alert-summary">
+            <span class="icon">🔔</span>
+            <div class="text">
+                <h3>Action Required</h3>
+                <p>
+                    You have <strong>{{ low_count }}</strong> low stock items and
+                    <strong>{{ out_count }}</strong> out of stock items.
+                    Please review and restock immediately.
+                </p>
+            </div>
+        </div>
+
+        <!-- ============================================
+        OUT OF STOCK
+        ============================================ -->
+        {% if out_of_stock_items %}
+        <div class="section-title">
+            🚫 Out of Stock
+            <span class="count-badge danger">{{ out_of_stock_items|length }}</span>
+        </div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Product</th>
+                        <th>SKU</th>
+                        <th>Qty</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in out_of_stock_items %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>
+                            <div class="product-name">{{ item.name }}</div>
+                            <div class="product-sku">{{ item.sku }}</div>
+                        </td>
+                        <td>{{ item.sku }}</td>
+                        <td class="stock-cell out-stock">{{ item.quantity }}</td>
+                        <td><span class="status-tag out">❌ Out of Stock</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
+        <!-- ============================================
+        LOW STOCK
+        ============================================ -->
+        {% if low_stock_items %}
+        <div class="section-title">
+            ⚠️ Low Stock
+            <span class="count-badge warning">{{ low_stock_items|length }}</span>
+        </div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Product</th>
+                        <th>SKU</th>
+                        <th>Quantity</th>
+                        <th>Min Level</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in low_stock_items %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>
+                            <div class="product-name">{{ item.name }}</div>
+                            <div class="product-sku">{{ item.sku }}</div>
+                        </td>
+                        <td>{{ item.sku }}</td>
+                        <td class="stock-cell low-stock">{{ item.quantity }}</td>
+                        <td>{{ item.min_stock_level }}</td>
+                        <td><span class="status-tag low">⚠️ Low Stock</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
+        <!-- ============================================
+        EMPTY STATE
+        ============================================ -->
+        {% if not out_of_stock_items and not low_stock_items %}
+        <div class="empty-state">
+            <div class="icon">🎉</div>
+            <p style="font-size:16px; font-weight:600; color:#1e293b;">All products are in stock!</p>
+            <p style="font-size:14px; color:#94a3b8; margin-top:4px;">No low stock or out‑of‑stock items found.</p>
+        </div>
+        {% endif %}
+
+        <!-- ============================================
+        ACTION BUTTONS
+        ============================================ -->
+        <div class="action-buttons">
+            <a href="{{ site_url }}/admin/products/product/" class="btn btn-info">
+                🛒 View All Products
+            </a>
+            {% if low_stock_items or out_of_stock_items %}
+            <a href="{{ site_url }}/admin/products/product/?quantity__lte=min_stock_level" class="btn btn-info">
+                ⚠️ View Low Stock
+            </a>
+            {% endif %}
+            <a href="{{ site_url }}/admin/" class="btn btn-outline">
+                📊 Dashboard
+            </a>
+        </div>
+
+    </div>
+
+    <!-- ============================================
+    FOOTER
+    ============================================ -->
+    <div class="footer">
+        <p>
+            This is an automated alert from <span class="brand">{{ site_name }}</span>.<br>
+            Generated at: {{ current_time|date:"d M Y, h:i A" }}
+        </p>
+        <div class="links">
+            <a href="{{ site_url }}/admin/settings/email/">⚙️ Configure Alerts</a>
+            <span class="divider">•</span>
+            <a href="{{ site_url }}/admin/products/product/">📋 Manage Products</a>
+            <span class="divider">•</span>
+            <a href="{{ site_url }}">🏠 Go to Dashboard</a>
+        </div>
+        <p style="margin-top:12px; font-size:12px; color:#cbd5e1;">
+            &copy; {{ year }} {{ site_name }}. All rights reserved.
+        </p>
+    </div>
+
+</div>
+
+</body>
+</html>
